@@ -14,6 +14,7 @@ const ArticlesScreen = () => {
 
   useEffect(() => {
     fetchCategories();
+    fetchArticles(); // Call fetchArticles() on initial render to display all articles by default
   }, []);
 
   useEffect(() => {
@@ -116,6 +117,7 @@ const ArticlesScreen = () => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
