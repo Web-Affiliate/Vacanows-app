@@ -3,6 +3,8 @@ import { View, StyleSheet, TouchableOpacity, Text, ImageBackground, ScrollView, 
 import PropTypes from 'prop-types';
 import Carousel from 'react-native-snap-carousel';
 import axios from 'axios';
+import { API_URL } from '@env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = ({ navigation }) => {
   const [content, setContent] = useState(null);
@@ -14,13 +16,20 @@ const HomeScreen = ({ navigation }) => {
     return code;
   };
 
+  const geenrateRandomPseudo = () => {
+    const randomSuffix = Math.floor(Math.random() * 10000);
+    const user = `user_${randomSuffix}`;
+
+    return user;
+  }
+
   const generateGroupCode = async () => {
     try {
-      const code = generateCode(5);
+      const code = generateCode();
       setGroupCode(code);
       console.log('Group code:', code);
       const response = await axios.post(
-        'https://mathis.daniel-monteiro.fr/api/roomss',
+        `${API_URL}/roomss`,
         {
           code: code,
           participants: 1
@@ -34,14 +43,37 @@ const HomeScreen = ({ navigation }) => {
       if (response.status === 201) {
         console.log('Room created successfully:', response.data);
         const roomId = response.data.id;
-        navigation.navigate('CreateGroup', { roomId: roomId });
-      } else {
+        const pseudo = geenrateRandomPseudo();
+        await AsyncStorage.setItem('randomPseudo', pseudo);
+        console.log('Pseudo:', pseudo);
+        console.log('Room ID:', `/api/roomss/${roomId}`);
+        const userResponse = await axios.post(
+          `${API_URL}/users_apps`,
+          {
+            nom: pseudo,
+            rooms: `/api/roomss/${roomId}`
+          },
+          {
+            headers: {
+              'Content-Type': 'application/ld+json'
+            }
+          }
+        );
+        if (userResponse.status === 201) {
+          console.log('User created successfully:', userResponse.data);
+          const userId = userResponse.data.id;
+          navigation.navigate('CreateGroup', { roomId: roomId, userId: userId });
+        } else {
+          throw new Error('Failed to create user');
+        }
+            } else {
         throw new Error('Failed to create room');
-      }
+            }
     } catch (error) {
       console.error('Error creating room:', error);
     }
   };
+
 
   useEffect(() => {
     fetchContent();
@@ -49,7 +81,7 @@ const HomeScreen = ({ navigation }) => {
 
   const fetchContent = async () => {
     try {
-      const response = await axios.get('https://mathis.daniel-monteiro.fr/api/contents');
+      const response = await axios.get(`${API_URL}/contents`);
       if (response.status === 200) {
         setContent(response.data);
       } else {
@@ -179,12 +211,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#B04F08',
     marginBottom: 20,
+    textAlign: 'center',
   },
   contentParagraph: {
     fontSize: 16,
     color: '#777',
     marginBottom: 20,
     lineHeight: 20,
+    textAlign: 'center',
     },
   subtitle: {
     fontSize: 16,

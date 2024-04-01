@@ -1,21 +1,55 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import { API_URL } from '@env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const JoinGroupScreen = ({ navigation }) => {
   const [groupCode, setGroupCode] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigation();
 
+  const generateRandomPseudo = () => {
+    const randomSuffix = Math.floor(Math.random() * 10000);
+    const user = `user_${randomSuffix}`;
+    return user;
+  }
+
   const joinGroup = async () => {
+    setIsLoading(true);
     try {
-      const response = await axios.get(`https://mathis.daniel-monteiro.fr/api/roomss?code=${groupCode}`);
+      const response = await axios.get(`${API_URL}/roomss?code=${groupCode}`);
       console.log('Join group response:', response.data);
       console.log('Group code:', groupCode);
 
       if (response.data['hydra:totalItems'] === 1) {
         const room = response.data['hydra:member'][0];
-        navigation.navigate('CreateGroup', { roomId: room.id, groupCode: room.code });
+
+        const pseudo = generateRandomPseudo();
+
+        const userResponse = await axios.post(
+          `${API_URL}/users_apps`,
+          {
+            nom: pseudo,
+            rooms: `/api/roomss/${room.id}`
+          },
+          {
+            headers: {
+              'Content-Type': 'application/ld+json'
+            }
+          }
+        );
+
+        if (userResponse.status === 201) {
+          console.log('User created successfully:', userResponse.data);
+          await AsyncStorage.setItem('randomPseudo', pseudo);
+          const userId = userResponse.data.id;
+
+          navigation.navigate('CreateGroup', { roomId: room.id, groupCode: groupCode, userId: userId });
+        } else {
+          throw new Error('Failed to create user');
+        }
       } else if (response.data['hydra:totalItems'] === 0) {
         Alert.alert('Code de groupe invalide', 'Veuillez saisir un code de groupe valide.');
       } else {
@@ -23,6 +57,10 @@ const JoinGroupScreen = ({ navigation }) => {
       }
     } catch (error) {
       console.error('Error joining group:', error);
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
     }
   };
 
@@ -37,12 +75,21 @@ const JoinGroupScreen = ({ navigation }) => {
         onChangeText={setGroupCode}
         maxLength={5}
       />
-      <TouchableOpacity style={styles.button} onPress={joinGroup}>
-        <Text style={styles.buttonText}>Rejoindre</Text>
+      <TouchableOpacity
+        style={[styles.button, isLoading && styles.disabledButton]}
+        onPress={isLoading ? null : joinGroup}
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Rejoindre</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
-};
+}
+
 
 const styles = StyleSheet.create({
   container: {
@@ -76,6 +123,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
 });
 

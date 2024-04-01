@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, Linking } from 'react-native';
 import { Button } from 'react-native-elements';
 import axios from 'axios';
+import { API_URL } from '@env';
 
 const VueArticlesScreen = ({ route }) => {
     const { articleId } = route.params;
@@ -13,7 +14,7 @@ const VueArticlesScreen = ({ route }) => {
 
     const fetchArticle = async () => {
         try {
-            const response = await axios.get(`https://mathis.daniel-monteiro.fr/api/articless/${articleId}`);
+            const response = await axios.get(`${API_URL}/articless/${articleId}`);
             if (response.status === 200) {
                 setArticle(response.data);
             } else {
@@ -49,11 +50,13 @@ const VueArticlesScreen = ({ route }) => {
                     <Text style={styles.paragraph}>{removeHtmlTags(article.paragraph_2)}</Text>
                     <Text style={styles.title}>{article.titre_3}</Text>
                     <Text style={styles.paragraph}>{removeHtmlTags(article.paragraph_3)}</Text>
-                    <Button
-                        title="Lien vers TripAdvisor"
-                        buttonStyle={{ backgroundColor: '#B04F08', borderRadius: 10, marginBottom: 50 }}
-                        onPress={openAffiliateLink}
-                    />
+                    {article.affiliate_link && (
+                        <Button
+                            title="Lien vers TripAdvisor"
+                            buttonStyle={{ backgroundColor: '#B04F08', borderRadius: 10, marginBottom: 50 }}
+                            onPress={openAffiliateLink}
+                        />
+                    )}
                 </>
             ) : (
                 <Text>Loading...</Text>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import axios from 'axios';
+import { API_URL } from '@env';
 
 const generateToken = (length) => {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -34,7 +35,7 @@ const NewsletterScreen = () => {
             return;
         }
 
-        axios.post('https://mathis.daniel-monteiro.fr/api/todos', {
+        axios.post(`${API_URL}/todos`, {
             mail: email,
             site: siteId,
             token: token,
