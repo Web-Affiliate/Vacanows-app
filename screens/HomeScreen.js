@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, ImageBackground, ScrollView, Image  } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, ImageBackground, ScrollView, Image, Modal, Button } from 'react-native';
 import PropTypes from 'prop-types';
 import Carousel from 'react-native-snap-carousel';
 import axios from 'axios';
@@ -9,17 +9,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const HomeScreen = ({ navigation }) => {
   const [content, setContent] = useState(null);
   const [groupCode, setGroupCode] = useState(null);
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState('');
+  const [articles, setArticles] = useState([]);
 
   const generateCode = () => {
     const code = Math.floor(10000 + Math.random() * 90000);
     return code;
   };
 
-  const geenrateRandomPseudo = () => {
+  const generateRandomPseudo = () => {
     const randomSuffix = Math.floor(Math.random() * 10000);
     const user = `user_${randomSuffix}`;
-
     return user;
   }
 
@@ -32,7 +33,9 @@ const HomeScreen = ({ navigation }) => {
         `${API_URL}/roomss`,
         {
           code: code,
-          participants: 1
+          participants: 1,
+          isStarted: false
+
         },
         {
           headers: {
@@ -43,7 +46,7 @@ const HomeScreen = ({ navigation }) => {
       if (response.status === 201) {
         console.log('Room created successfully:', response.data);
         const roomId = response.data.id;
-        const pseudo = geenrateRandomPseudo();
+        const pseudo = generateRandomPseudo();
         await AsyncStorage.setItem('randomPseudo', pseudo);
         console.log('Pseudo:', pseudo);
         console.log('Room ID:', `/api/roomss/${roomId}`);
@@ -60,24 +63,51 @@ const HomeScreen = ({ navigation }) => {
           }
         );
         if (userResponse.status === 201) {
-          console.log('User created successfully:', userResponse.data);
           const userId = userResponse.data.id;
           navigation.navigate('CreateGroup', { roomId: roomId, userId: userId });
         } else {
           throw new Error('Failed to create user');
         }
-            } else {
+      } else {
         throw new Error('Failed to create room');
-            }
+      }
     } catch (error) {
       console.error('Error creating room:', error);
     }
   };
 
-
   useEffect(() => {
     fetchContent();
+    fetchRandomArticles();
   }, []);
+
+  const fetchRandomArticles = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/articless`);
+      if (response.status === 200) {
+        const randomArticles = response.data['hydra:member'].sort(() => 0.5 - Math.random()).slice(0, 5);
+        setArticles(randomArticles);
+      } else {
+        throw new Error('Failed to fetch articles');
+      }
+    } catch (error) {
+      console.error('Error fetching articles:', error);
+    }
+  };
+
+  const renderArticleCarouselItem = ({ item }) => (
+    <TouchableOpacity style={styles.carouselItem2} onPress={() => handleArticlePress(item)}>
+    <View style={styles.carouselItem2}>
+      <ImageBackground source={{ uri: `https://mathis.daniel-monteiro.fr/uploads/images/${item.image1}` }} style={styles.carouselImage}>
+        <Text style={styles.carouselTitle}>{item.titre_1}</Text>
+      </ImageBackground>
+    </View>
+    </TouchableOpacity>
+  );
+
+  const handleArticlePress = (article) => {
+    navigation.navigate('VueArticlesScreen', { articleId: article.id });
+  };
 
   const fetchContent = async () => {
     try {
@@ -92,18 +122,24 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
+  const openModal = (text) => {
+    setModalContent(text);
+    setModalVisible(true);
+  };
 
-  const navigateToJoinGroup = () => {
-    navigation.navigate('JoinGroup');
+  const closeModal = () => {
+    setModalVisible(false);
+    setModalContent('');
   };
 
   const removeHtmlTags = (textWithHtml) => {
     if (textWithHtml) {
-      return textWithHtml.replace(/<[^>]*>?/gm, '');
+      let textWithoutTags = textWithHtml.replace(/<[^>]*>?/gm, '');
+      textWithoutTags = textWithoutTags.replace(/&nbsp;/g, '');
+      return textWithoutTags;
     }
     return '';
   };
-  
 
   const carouselItems = [
     {
@@ -123,6 +159,11 @@ const HomeScreen = ({ navigation }) => {
       title: 'Nos Activités',
     }
   ];
+
+  const navigateToJoinGroup = () => {
+    navigation.navigate('JoinGroup');
+  };
+
 
   const renderCarouselItem = ({ item }) => (
     <View style={styles.carouselItem}>
@@ -146,34 +187,78 @@ const HomeScreen = ({ navigation }) => {
         {content && (
           <View style={styles.contentContainer}>
             <Text style={styles.contentTitle}>{content['hydra:member'][0].titre_1}</Text>
-            <Text style={styles.contentParagraph}>{removeHtmlTags(content['hydra:member'][0].description)}</Text>
-            <Image
-              source={{ uri: `https://mathis.daniel-monteiro.fr/uploads/images/${content['hydra:member'][0].image_1_no_border}` }}
-              style={{ width: '100%', height: 200, marginBottom: 20 }}
+            <View style={styles.paragraphContainer}>
+              <Text numberOfLines={7} style={styles.subtitle}>{removeHtmlTags(content['hydra:member'][0].paragraph_1)}</Text>
+              <TouchableOpacity onPress={() => openModal(removeHtmlTags(content['hydra:member'][0].paragraph_1))}>
+                <Text style={styles.moreButtonText}>En savoir plus</Text>
+              </TouchableOpacity>
+            </View>
+           <View>
+            <Carousel
+              layout="default"
+              data={articles}
+              sliderWidth={370}
+              itemWidth={300}
+              renderItem={renderArticleCarouselItem}
+              loop={true}
             />
+          </View>
             <Text style={styles.contentSubtitle}>{content['hydra:member'][0].sous_titre_1}</Text>
-            <Text style={styles.subtitle}>{removeHtmlTags(content['hydra:member'][0].paragraph_4)}</Text>
-            {/* <Text style={styles.contentSubtitle}>{content['hydra:member'][0].sous_titre_2}</Text>
-            <Text style={styles.subtitle}>{removeHtmlTags(content['hydra:member'][0].paragraph_5)}</Text>
+            <View style={styles.paragraphContainer}>
+              <Text numberOfLines={7} style={styles.subtitle}>{removeHtmlTags(content['hydra:member'][0].paragraph_4)}</Text>
+              <TouchableOpacity onPress={() => openModal(removeHtmlTags(content['hydra:member'][0].paragraph_4))}>
+                <Text style={styles.moreButtonText}>En savoir plus</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.contentSubtitle}>{content['hydra:member'][0].sous_titre_2}</Text>
+            <View style={styles.paragraphContainer}>
+              <Text numberOfLines={7} style={styles.subtitle}>{removeHtmlTags(content['hydra:member'][0].paragraph_5)}</Text>
+              <TouchableOpacity onPress={() => openModal(removeHtmlTags(content['hydra:member'][0].paragraph_5))}>
+                <Text style={styles.moreButtonText}>En savoir plus</Text>
+              </TouchableOpacity>
+            </View>
             <Text style={styles.contentSubtitle}>{content['hydra:member'][0].sous_titre_3}</Text>
-            <Text style={styles.subtitle}>{removeHtmlTags(content['hydra:member'][0].paragraph_6)}</Text> */}
+            <View style={styles.paragraphContainer}>
+              <Text numberOfLines={7} style={styles.subtitle}>{removeHtmlTags(content['hydra:member'][0].paragraph_6)}</Text>
+              <TouchableOpacity onPress={() => openModal(removeHtmlTags(content['hydra:member'][0].paragraph_6))}>
+                <Text style={styles.moreButtonText}>En savoir plus</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
+        <View style={styles.contentContainerJoin}>
         <Text style={styles.contentTitle2}>Créez ou rejoignez un groupe pour démarrer votre recherche de voyage à plusieurs</Text>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={generateGroupCode}>
+          <TouchableOpacity style={[styles.button, styles.buttonJoin]} onPress={generateGroupCode}>
             <Text style={styles.buttonText}>Créer un groupe</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={navigateToJoinGroup}>
+          <TouchableOpacity style={[styles.button, styles.buttonJoin]} onPress={navigateToJoinGroup}>
             <Text style={styles.buttonText}>Rejoindre un groupe</Text>
           </TouchableOpacity>
         </View>
+        </View>
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <ScrollView>
+              <Text style={styles.modalText}>{modalContent}</Text>
+            </ScrollView>
+            <TouchableOpacity onPress={closeModal} style={{ backgroundColor: '#B04F08', marginTop: 20, paddingHorizontal: 50, paddingVertical: 10, borderRadius: 5 }}>
+              <Text style={styles.buttonText}>Fermer</Text>
+            </TouchableOpacity>
+            </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
-  
 };
-
 
 HomeScreen.propTypes = {
   navigation: PropTypes.shape({
@@ -194,6 +279,11 @@ const styles = StyleSheet.create({
   carouselItem: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  carouselItem2: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
   },
   carouselImage: {
     width: 300,
@@ -236,18 +326,26 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
-  contentParagraph: {
-    fontSize: 16,
-    color: '#777',
+  paragraphContainer: {
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
     marginBottom: 20,
-    lineHeight: 20,
-    textAlign: 'center',
+    padding: 10,
   },
   subtitle: {
     fontSize: 16,
     color: '#777',
     marginBottom: 20,
     textAlign: 'justify',
+  },
+  moreButtonText: {
+    color: '#fff',
+    textAlign: 'center',
+    marginTop: 5,
+    padding: 15,
+    backgroundColor: '#B04F08',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   buttonContainer: {
     width: '100%',
@@ -275,7 +373,46 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 20,
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 25,
+    width: '90%',
+    maxHeight: '60%',
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#777',
+    lineHeight: 22,
+  },
+  buttonModal: {
+    backgroundColor: '#B04F08',
+    borderRadius: 5,
+    padding: 10,
+    marginTop: 20,
+  },
+  contentContainerJoin: {
+    marginTop: 20,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    padding: 10,
+    width: '100%',
+    backgroundColor: '#fff',
+  },
+  buttonJoin: {
+    backgroundColor: '#B04F08',
+    borderRadius: 5,
+    paddingVertical: 15,
+    paddingHorizontal: 50,
+    marginBottom: 20,
+  },
+
 });
 
 export default HomeScreen;
-

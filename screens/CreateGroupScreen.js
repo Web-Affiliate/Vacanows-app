@@ -76,6 +76,14 @@ const CreateGroupScreen = ({ route }) => {
         if (usersResponse.status === 200) {
           setUsers(usersResponse.data['hydra:member']);
           setParticipants(usersResponse.data['hydra:member'].length);
+
+          // Vérifier si le jeu a commencé
+          if (response.data.isStarted) {
+            // Si le jeu a commencé, rediriger chaque utilisateur vers la page du jeu
+            usersResponse.data['hydra:member'].forEach(user => {
+              navigation.navigate('GameScreen', { roomId, userId: user.id, participants });
+            });
+          }
         } else {
           throw new Error('Failed to fetch users');
         }
@@ -90,8 +98,21 @@ const CreateGroupScreen = ({ route }) => {
   };
 
   useEffect(() => {
-    fetchParticipants();
+    if (isStarting) {
+      fetchParticipants();
+    }
+  }, [isStarting]);
+
+
+  useEffect(() => {
     retrieveRandomPseudo();
+    fetchParticipants();
+
+    const interval = setInterval(() => {
+      fetchParticipants();
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const retrieveRandomPseudo = async () => {
@@ -107,9 +128,25 @@ const CreateGroupScreen = ({ route }) => {
 
   const startDisabled = participants < 2;
 
-  const handleStart = () => {
+  const handleStart = async () => {
     console.log('Starting game...');
-    setIsStarting(true);
+
+    try {
+      const response = await axios.patch(`${API_URL}/roomss/${roomId}`, { isStarted: true }, {
+        headers: {
+          'Content-Type': 'application/merge-patch+json'
+        }
+      });
+      if (response.status === 200) {
+        console.log('Game started successfully');
+        navigation.navigate('GameScreen', { roomId, userId, participants });
+      } else {
+        throw new Error('Failed to start game');
+      }
+    }
+    catch (error) {
+      console.error('Error starting game:', error);
+    }
   };
 
   return (

@@ -11,6 +11,7 @@ import NewsletterScreen from './screens/NewsletterScreen';
 import CreateGroupScreen from './screens/CreateGroupScreen';
 import JoinGroupScreen from './screens/JoinGroupScreen';
 import VueArticlesScreen from './screens/VueArticlesScreen';
+import GameScreen from './screens/GameScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -32,7 +33,7 @@ const MainTabNavigator = () => {
     initialRouteName="Home"
     screenOptions={({ route }) => ({
       tabBarActiveTintColor: '#fff',
-      tabBarInactiveTintColor: '#ccc', // Couleur grise pour les icônes inactives
+      tabBarInactiveTintColor: '#ccc',
       tabBarStyle: {
         backgroundColor: '#B04F08',
         borderTopRightRadius: 10,
@@ -106,17 +107,16 @@ const MainTabNavigator = () => {
   );
 };
 
-// Composant de navigation pour l'écran CreateGroupScreen
 const AppNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerTitle: () => <CustomHeader />, // Utilize the custom header component
+        headerTitle: () => <CustomHeader />,
         headerStyle: {
           backgroundColor: '#f9f9f9',
         },
-        headerTintColor: '#000', // Set the color of the header text
-        headerTitleAlign: 'center', // Align the header title to the center
+        headerTintColor: '#000',
+        headerTitleAlign: 'center',
       }}
     >
       <Stack.Screen
@@ -138,6 +138,11 @@ const AppNavigator = () => {
         name="VueArticlesScreen"
         component={VueArticlesScreen}
         options={{ title: 'Article' }}
+      />
+      <Stack.Screen
+        name="GameScreen"
+        component={GameScreen}
+        options={{ title: 'Jeu' }}
       />
     </Stack.Navigator>
   );
