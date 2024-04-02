@@ -62,8 +62,8 @@ const NewsletterScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Inscription à la newsletter</Text>
             <View style={styles.formContainer}>
+                <Text style={styles.title}>Inscription à la newsletter</Text>
                 <TextInput
                     style={styles.input}
                     placeholder="Entrez votre adresse e-mail"
@@ -95,15 +95,25 @@ const styles = StyleSheet.create({
         backgroundColor: '#f9f9f9',
     },
     title: {
-        fontSize: 24,
+        fontSize: 16,
         fontWeight: 'bold',
-        color: '#B04F08',
+        color: '#E76F51',
         marginBottom: 20,
+        textAlign: 'center',
     },
     formContainer: {
         width: '80%',
         borderRadius: 10,
         padding: 20,
+        backgroundColor: '#fff',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     input: {
         borderRadius: 5,

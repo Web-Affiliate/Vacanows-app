@@ -97,9 +97,13 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate('JoinGroup');
   };
 
-//   const removeHtmlTags = (textWithHtml) => {
-//     return textWithHtml.replace(/<[^>]+>/g, '');
-// };
+  const removeHtmlTags = (textWithHtml) => {
+    if (textWithHtml) {
+      return textWithHtml.replace(/<[^>]*>?/gm, '');
+    }
+    return '';
+  };
+  
 
   const carouselItems = [
     {
@@ -129,7 +133,7 @@ const HomeScreen = ({ navigation }) => {
   );
 
   return (
-    <ScrollView>
+    <ScrollView style={styles.background}>
       <View style={styles.container}>
         <Carousel
           layout="default"
@@ -142,18 +146,24 @@ const HomeScreen = ({ navigation }) => {
         {content && (
           <View style={styles.contentContainer}>
             <Text style={styles.contentTitle}>{content['hydra:member'][0].titre_1}</Text>
-            <Text style={styles.contentParagraph}>Découvrez Vacanows, votre guide ultime pour des voyages sans frontières. Explorez des destinations exotiques, des guides pratiques et des recommandations de restaurants, le tout à portée de clic.</Text>
+            <Text style={styles.contentParagraph}>{removeHtmlTags(content['hydra:member'][0].description)}</Text>
             <Image
               source={{ uri: `https://mathis.daniel-monteiro.fr/uploads/images/${content['hydra:member'][0].image_1_no_border}` }}
               style={{ width: '100%', height: 200, marginBottom: 20 }}
             />
+            <Text style={styles.contentSubtitle}>{content['hydra:member'][0].sous_titre_1}</Text>
+            <Text style={styles.subtitle}>{removeHtmlTags(content['hydra:member'][0].paragraph_4)}</Text>
+            {/* <Text style={styles.contentSubtitle}>{content['hydra:member'][0].sous_titre_2}</Text>
+            <Text style={styles.subtitle}>{removeHtmlTags(content['hydra:member'][0].paragraph_5)}</Text>
+            <Text style={styles.contentSubtitle}>{content['hydra:member'][0].sous_titre_3}</Text>
+            <Text style={styles.subtitle}>{removeHtmlTags(content['hydra:member'][0].paragraph_6)}</Text> */}
           </View>
         )}
         <Text style={styles.contentTitle2}>Créez ou rejoignez un groupe pour démarrer votre recherche de voyage à plusieurs</Text>
         <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={generateGroupCode}>
-          <Text style={styles.buttonText}>Créer un groupe</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={generateGroupCode}>
+            <Text style={styles.buttonText}>Créer un groupe</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={navigateToJoinGroup}>
             <Text style={styles.buttonText}>Rejoindre un groupe</Text>
           </TouchableOpacity>
@@ -161,6 +171,7 @@ const HomeScreen = ({ navigation }) => {
       </View>
     </ScrollView>
   );
+  
 };
 
 
@@ -171,6 +182,9 @@ HomeScreen.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  background: {
+    backgroundColor: '#f9f9f9',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -205,7 +219,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     width: '100%',
+    backgroundColor: '#fff',
   },
+  contentSubtitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#B04F08',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+
   contentTitle: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -219,7 +242,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     lineHeight: 20,
     textAlign: 'center',
-    },
+  },
   subtitle: {
     fontSize: 16,
     color: '#777',
@@ -255,3 +278,4 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
+

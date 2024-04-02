@@ -66,6 +66,7 @@ const JoinGroupScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.formContainer}>
       <Text style={styles.title}>Rejoindre un groupe</Text>
       <TextInput
         style={styles.input}
@@ -86,10 +87,10 @@ const JoinGroupScreen = ({ navigation }) => {
           <Text style={styles.buttonText}>Rejoindre</Text>
         )}
       </TouchableOpacity>
+      </View>
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -99,25 +100,42 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     padding: 20,
   },
+  formContainer: {
+    width: '80%',
+    borderRadius: 10,
+    padding: 20,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: {
+        width: 0,
+        height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+},
   title: {
-    fontSize: 24,
+    fontSize: 16,
     fontWeight: 'bold',
+    color: '#E76F51',
     marginBottom: 20,
+    textAlign: 'center',
   },
   input: {
-    width: '100%',
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
     borderRadius: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
     marginBottom: 20,
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    color: '#333',
   },
   button: {
-    backgroundColor: '#B04F08',
+    backgroundColor: '#E76F51',
     borderRadius: 5,
-    paddingVertical: 15,
+    paddingVertical: 10,
     paddingHorizontal: 50,
+    alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
