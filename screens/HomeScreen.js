@@ -85,7 +85,7 @@ const HomeScreen = ({ navigation }) => {
     try {
       const response = await axios.get(`${API_URL}/articless`);
       if (response.status === 200) {
-        const randomArticles = response.data['hydra:member'].sort(() => 0.5 - Math.random()).slice(0, 5);
+        const randomArticles = response.data['hydra:member'].sort(() => 0.5 - Math.random()).slice(0, 10);
         setArticles(randomArticles);
       } else {
         throw new Error('Failed to fetch articles');
@@ -226,17 +226,17 @@ const HomeScreen = ({ navigation }) => {
             </View>
           </View>
         )}
-        <View style={styles.contentContainerJoin}>
-        <Text style={styles.contentTitle2}>Créez ou rejoignez un groupe pour démarrer votre recherche de voyage à plusieurs</Text>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={[styles.button, styles.buttonJoin]} onPress={generateGroupCode}>
-            <Text style={styles.buttonText}>Créer un groupe</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.buttonJoin]} onPress={navigateToJoinGroup}>
-            <Text style={styles.buttonText}>Rejoindre un groupe</Text>
-          </TouchableOpacity>
-        </View>
-        </View>
+       <View style={styles.contentContainerJoin}>
+      <Text style={styles.contentTitle3}>Créez ou rejoignez un groupe pour démarrer votre recherche de voyage à plusieurs</Text>
+      <View style={styles.formContainer}>
+        <TouchableOpacity style={[styles.button, styles.buttonCreate]} onPress={generateGroupCode}>
+          <Text style={styles.buttonText}>Créer un groupe</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.button, styles.buttonJoin]} onPress={navigateToJoinGroup}>
+          <Text style={styles.buttonText}>Rejoindre un groupe</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
       </View>
 
       <Modal
@@ -405,6 +405,14 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: '#fff',
   },
+  contentTitle3: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#E76F51',
+    marginBottom: 20,
+    textAlign: 'center',
+    textDecorationLine: 'underline',
+  },
   buttonJoin: {
     backgroundColor: '#B04F08',
     borderRadius: 5,
@@ -413,6 +421,29 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 
+  contentContainerJoin: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#EDEDED', 
+    padding: 20,
+  },
+
+  formContainer: {
+    width: '80%',
+  },
+  
+  buttonCreate: {
+    backgroundColor: '#E76F51',
+  },
+  buttonJoin: {
+    backgroundColor: '#E76F51',
+  },
+  buttonText: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
 });
 
 export default HomeScreen;
