@@ -226,17 +226,17 @@ const HomeScreen = ({ navigation }) => {
             </View>
           </View>
         )}
-       <View style={styles.contentContainerJoin}>
-      <Text style={styles.contentTitle3}>Créez ou rejoignez un groupe pour démarrer votre recherche de voyage à plusieurs</Text>
-      <View style={styles.formContainer}>
-        <TouchableOpacity style={[styles.button, styles.buttonCreate]} onPress={generateGroupCode}>
-          <Text style={styles.buttonText}>Créer un groupe</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.buttonJoin]} onPress={navigateToJoinGroup}>
-          <Text style={styles.buttonText}>Rejoindre un groupe</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+          <View style={styles.contentContainerJoin}>
+            <Text style={styles.contentTitle3}>Créez ou rejoignez un groupe pour démarrer votre recherche de voyage à plusieurs</Text>
+            <View style={styles.formContainer}>
+              <TouchableOpacity style={[styles.button, styles.buttonCreate]} onPress={generateGroupCode}>
+                <Text style={styles.buttonText}>Créer un groupe</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.button, styles.buttonJoin]} onPress={navigateToJoinGroup}>
+                <Text style={styles.buttonText}>Rejoindre un groupe</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
       </View>
 
       <Modal
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   button: {
-    backgroundColor: '#B04F08',
+    backgroundColor: '#E76F51',
     borderRadius: 5,
     paddingVertical: 15,
     paddingHorizontal: 50,
@@ -408,10 +408,10 @@ const styles = StyleSheet.create({
   contentTitle3: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#E76F51',
+    color: '#B04F08',
     marginBottom: 20,
     textAlign: 'center',
-    textDecorationLine: 'underline',
+    fontStyle: 'italic',
   },
   buttonJoin: {
     backgroundColor: '#B04F08',
@@ -425,24 +425,30 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#EDEDED', 
+    backgroundColor: '#EDEDED',
     padding: 20,
   },
 
   formContainer: {
     width: '80%',
   },
-  
+
   buttonCreate: {
     backgroundColor: '#E76F51',
+    marginBottom: 20,
+    borderWidth:3,
+    borderColor: '#B04F08',
   },
   buttonJoin: {
     backgroundColor: '#E76F51',
+    borderWidth:3,
+    borderColor: '#B04F08',
   },
   buttonText: {
     fontSize: 16,
     color: '#FFFFFF',
     fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

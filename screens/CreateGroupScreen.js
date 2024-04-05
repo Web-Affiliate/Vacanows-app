@@ -13,6 +13,7 @@ const CreateGroupScreen = ({ route }) => {
   const [code, setCode] = useState('');
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingStart, setIsLoadingStart] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
   const [pseudo, setPseudo] = useState('');
 
@@ -130,6 +131,7 @@ const CreateGroupScreen = ({ route }) => {
 
   const handleStart = async () => {
     console.log('Starting game...');
+    setIsLoadingStart(true);
 
     try {
       const response = await axios.patch(`${API_URL}/roomss/${roomId}`, { isStarted: true }, {
@@ -139,7 +141,7 @@ const CreateGroupScreen = ({ route }) => {
       });
       if (response.status === 200) {
         console.log('Game started successfully');
-        navigation.navigate('GameScreen', { roomId, userId, participants });
+        // Remove the navigation code here
       } else {
         throw new Error('Failed to start game');
       }
@@ -148,6 +150,7 @@ const CreateGroupScreen = ({ route }) => {
       console.error('Error starting game:', error);
     }
   };
+
 
   return (
     <View style={styles.container}>
@@ -172,7 +175,11 @@ const CreateGroupScreen = ({ route }) => {
         onPress={handleStart}
         disabled={startDisabled}
       >
-        <Text style={styles.buttonText}>Commencer</Text>
+        {isLoadingStart ? (
+          <ActivityIndicator color="#ffffff" />
+        ) : (
+          <Text style={styles.buttonText}>Commencer</Text>
+        )}
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.refreshButton}
@@ -265,3 +272,4 @@ const styles = StyleSheet.create({
 });
 
 export default CreateGroupScreen;
+
