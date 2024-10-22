@@ -35,7 +35,7 @@ const ArticlesScreen = () => {
       if (response.status === 200) {
         const extractedArticles = response.data['hydra:member'].map(async article => {
           // Extract the necessary fields from each article
-          const sousCategoriesResponse = await axios.get(`https://mathis.daniel-monteiro.fr${article.sous_categories_2}`);
+          const sousCategoriesResponse = await axios.get(`https://m8abtvtsrl.vacanows.com${article.sous_categories_2}`);
           const sousCategories2 = sousCategoriesResponse.data;
           return {
             nom: sousCategories2.nom,
@@ -99,7 +99,7 @@ const ArticlesScreen = () => {
             articles.map((article, index) => (
               <TouchableOpacity key={index} style={styles.card} onPress={() => handleArticlePress(article)}>
                 <Image
-                  source={{ uri: `https://mathis.daniel-monteiro.fr/uploads/images/${article.image}` }}
+                  source={{ uri: `https://m8abtvtsrl.vacanows.com/uploads/images/${article.image}` }}
                   style={styles.leftImage}
                 />
                 <View style={styles.contentContainer}>

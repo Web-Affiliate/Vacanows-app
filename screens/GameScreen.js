@@ -96,7 +96,7 @@ const fetchRandomCategory = async () => {
           {randomCategory ? (
             <>
               <Image
-                source={{ uri: `https://mathis.daniel-monteiro.fr/uploads/images/${randomCategory.image}` }}
+                source={{ uri: `https://m8abtvtsrl.vacanows.com/uploads/images/${randomCategory.image}` }}
                 style={styles.categoryImage}
                 resizeMode="cover"
               />

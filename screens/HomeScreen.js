@@ -98,7 +98,7 @@ const HomeScreen = ({ navigation }) => {
   const renderArticleCarouselItem = ({ item }) => (
     <TouchableOpacity style={styles.carouselItem2} onPress={() => handleArticlePress(item)}>
     <View style={styles.carouselItem2}>
-      <ImageBackground source={{ uri: `https://mathis.daniel-monteiro.fr/uploads/images/${item.image1}` }} style={styles.carouselImage}>
+      <ImageBackground source={{ uri: `https://m8abtvtsrl.vacanows.com/uploads/images/${item.image1}` }} style={styles.carouselImage}>
         <Text style={styles.carouselTitle}>{item.titre_1}</Text>
       </ImageBackground>
     </View>

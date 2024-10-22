@@ -43,7 +43,7 @@ const VueArticlesScreen = ({ route }) => {
                     <Text style={styles.paragraph}>{removeHtmlTags(article.paragraph_1)}</Text>
                     <Text style={styles.temps_lecture}>Temps de lecture: {article.temps_lecture} min</Text>
                     <Image
-                        source={{ uri: `https://mathis.daniel-monteiro.fr/uploads/images/${article.image_1}` }}
+                        source={{ uri: `https://m8abtvtsrl.vacanows.com/uploads/images/${article.image_1}` }}
                         style={styles.image}
                     />
                     <Text style={styles.title}>{article.titre_2}</Text>
